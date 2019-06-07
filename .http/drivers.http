@@ -1,0 +1,8 @@
+GET http://localhost:63975/api/driver
+
+###
+
+POST http://localhost:63975/api/driver/SG-2/load-van
+Content-Type: application/json
+
+{}
