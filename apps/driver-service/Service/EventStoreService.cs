@@ -25,11 +25,10 @@ namespace DriverService.Service
             await this.Insert(eventData.DriverId, DriverEventType.Hired, eventData);
         }
 
-        public async Task LoadVan(string driverId, TimedEvent evtData)
+        public async Task AddStatusEvent(string driverId, DriverEventType eventType)
         {
-            evtData.Time = DateTime.UtcNow;
-            await this.Insert(driverId, DriverEventType.LoadingVan, evtData);
-        }
+            await this.Insert(driverId, eventType, new { Time = DateTime.UtcNow });
+        }        
 
         private async Task Insert(string driverId, DriverEventType eventType, object data)
         {

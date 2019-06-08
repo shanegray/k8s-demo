@@ -1,7 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace DriverService.MongoConverters
 {
@@ -15,12 +14,8 @@ namespace DriverService.MongoConverters
         }
 
         public BsonDocument Convert()
-        {
-            var serializerSettings = new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
-            var data = JsonConvert.SerializeObject(this.theObject, serializerSettings);
+        {                        
+            var data = JsonConvert.SerializeObject(this.theObject);
             return BsonSerializer.Deserialize<BsonDocument>(data);
         }
     }

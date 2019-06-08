@@ -32,10 +32,7 @@ namespace DriverService
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            var pack = new ConventionPack();
-            pack.Add(new CamelCaseElementNameConvention());
-            ConventionRegistry.Register("camel case", pack, t => true);
+        {            
             app.UseMvc();
         }
     }

@@ -16,9 +16,7 @@ namespace DriverService.Handlers
 
         public async Task HandleMessage(TimedEvent data)
         {
-            var success = await this.readModelService.UpdateStatus(data.DriverId, DriverStatus.LoadingVan);
-
-            // TODO : Success Reporting
+            await this.readModelService.UpdateStatus(data.DriverId, DriverStatus.LoadingVan);
         }
     }
 }

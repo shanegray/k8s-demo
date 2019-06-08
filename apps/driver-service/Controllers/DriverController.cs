@@ -1,4 +1,5 @@
 ﻿using DriverService.Events;
+using DriverService.Models;
 using DriverService.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -31,11 +32,36 @@ namespace DriverService.Controllers
             return this.OkMessage();
         }
 
-        [HttpPost("{driverId}/load-van")]
-        public async Task<IActionResult> LoadVan([FromBody] TimedEvent data, string driverId)
+
+        // api/driver/<driver-id>/load-van
+        // api/driver/<driver-id>/run-started
+        // api/driver/<driver-id>/run-complete
+        [HttpPost("{driverId}/{eventString}")]
+        public async Task<IActionResult> UpdateStatus(string driverId, string eventString)
         {
-            await this.eventStoreService.LoadVan(driverId, data);
+            var eventType = GetEventTypeFromUrlSegment(eventString);
+
+            if (eventType == null)
+                return this.NotFound();
+
+            await this.eventStoreService.AddStatusEvent(driverId, eventType.Value);
+
             return this.OkMessage();
-        }        
+        }
+
+        private DriverEventType? GetEventTypeFromUrlSegment(string segment)
+        {
+            switch (segment)
+            {
+                case "load-van":
+                    return DriverEventType.LoadingVan;
+                case "run-started":
+                    return DriverEventType.RunStarted;
+                case "run-complete":
+                    return DriverEventType.RunComplete;
+                default:
+                    return null;
+            }
+        }
     }
 }

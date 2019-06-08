@@ -17,8 +17,6 @@ namespace DriverService.Handlers
         public async Task HandleMessage(TimedEvent data)
         {
             await this.readModelService.UpdateStatus(data.DriverId, DriverStatus.OnRun);
-
-            // TODO : Success Reporting
         }
     }
 }
