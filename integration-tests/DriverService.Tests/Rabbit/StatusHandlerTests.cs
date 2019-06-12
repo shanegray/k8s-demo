@@ -1,9 +1,6 @@
 ﻿using DriverService.Events;
 using DriverService.Handlers;
 using DriverService.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -16,6 +13,24 @@ namespace DriverService.Tests.Rabbit
         public StatusHandlerTests(DriverTestFixture fixture)
         {
             this.fixture = fixture;
+        }
+
+        [Fact]
+        public void LoadingVan_connected_to_right_queue()
+        {
+            Assert.Equal("driver.status-update.load-van.service", new LoadingVanHandler(this.fixture.ReadModelService).QueueName);
+        }
+
+        [Fact]
+        public void RunStarted_connected_to_right_queue()
+        {
+            Assert.Equal("driver.status-update.run-started.service", new RunStartedHandler(this.fixture.ReadModelService).QueueName);
+        }
+
+        [Fact]
+        public void RunCompleted_connected_to_right_queue()
+        {
+            Assert.Equal("driver.status-update.run-completed.service", new RunCompletedHandler(this.fixture.ReadModelService).QueueName);
         }
 
         [Fact]

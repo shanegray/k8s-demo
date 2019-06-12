@@ -1,22 +1,23 @@
 ﻿using DriverService.Events;
 using DriverService.Models;
 using DriverService.Service;
+using ShareMe.Carefully.Rabbit;
 using System.Threading.Tasks;
 
 namespace DriverService.Handlers
 {
-    public class RunStartedHandler
+    public class RunStartedHandler : GenericListener<TimedEvent>
     {
         private readonly ReadModelService readModelService;
 
-        public RunStartedHandler(ReadModelService readModelService)
+        public RunStartedHandler(ReadModelService readModelService) : base("driver.status-update.run-started.service")
         {
             this.readModelService = readModelService;
         }
 
-        public async Task HandleMessage(TimedEvent data)
+        public override Task<bool> HandleMessage(TimedEvent data)
         {
-            await this.readModelService.UpdateStatus(data.DriverId, DriverStatus.OnRun);
+            return this.readModelService.UpdateStatus(data.DriverId, DriverStatus.OnRun);
         }
     }
 }

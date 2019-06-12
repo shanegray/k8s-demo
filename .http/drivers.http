@@ -12,7 +12,10 @@ Content-Type: application/json
 
 ###
 
-POST http://localhost:63975/api/driver/SG-2/load-van
-Content-Type: application/json
+POST http://localhost:63975/api/driver/test-9/load-van
+###
 
-{}
+POST http://localhost:63975/api/driver/test-9/run-started
+###
+
+POST http://localhost:63975/api/driver/test-9/run-complete

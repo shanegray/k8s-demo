@@ -25,9 +25,9 @@ namespace DriverService.Service
             await this.Insert(eventData.DriverId, DriverEventType.Hired, eventData);
         }
 
-        public async Task AddStatusEvent(string driverId, DriverEventType eventType)
+        public async Task AddStatusEvent(string driverId, DriverEventType eventType, TimedEvent timedEvent)
         {
-            await this.Insert(driverId, eventType, new { Time = DateTime.UtcNow });
+            await this.Insert(driverId, eventType, timedEvent);
         }        
 
         private async Task Insert(string driverId, DriverEventType eventType, object data)

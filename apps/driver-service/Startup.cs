@@ -1,4 +1,5 @@
 using DriverService.Config;
+using DriverService.Handlers;
 using DriverService.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson.Serialization.Conventions;
+using ShareMe.Carefully.Rabbit;
 
 namespace DriverService
 {
@@ -21,12 +22,26 @@ namespace DriverService
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<MongoSettings>(Configuration.GetSection("mongoSettings"));
-            services.AddSingleton(s => s.GetRequiredService<IOptions<MongoSettings>>().Value);
+            // Setup singleton configs
+            CreateSingletonConfigSettings<MongoSettings>(services, "mongoSettings");
+            CreateSingletonConfigSettings<RabbitSettings>(services, "rabbitSettings");            
 
-            // Mongo client should be singleton
+            // It's ok to have MongoClient as a singleton
             services.AddSingleton<EventStoreService>();
             services.AddSingleton<ReadModelService>();
+
+            // Add RabbitHandler as Singleton (shutdown handled in hosted service)
+            services.AddSingleton(s => new RabbitHandler(s.GetRequiredService<RabbitSettings>().Uri));
+            services.AddTransient<RabbitMessenger>();
+            services.AddScoped<MessengerService>();
+
+            // Add Handlers as Singletons
+            services.AddSingleton<DriverHiredHandler>();
+            services.AddSingleton<LoadingVanHandler>();
+            services.AddSingleton<RunCompletedHandler>();
+            services.AddSingleton<RunStartedHandler>();
+            // Add hosted service for rabbit
+            services.AddHostedService<RabbitBackgroundService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -34,6 +49,12 @@ namespace DriverService
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {            
             app.UseMvc();
+        }
+
+        private void CreateSingletonConfigSettings<T>(IServiceCollection services, string section) where T : class, new()
+        {
+            services.Configure<T>(Configuration.GetSection(section));
+            services.AddSingleton(s => s.GetRequiredService<IOptions<T>>().Value);
         }
     }
 }

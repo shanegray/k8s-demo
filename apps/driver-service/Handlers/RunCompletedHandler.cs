@@ -1,20 +1,21 @@
 ﻿using DriverService.Events;
 using DriverService.Models;
 using DriverService.Service;
+using ShareMe.Carefully.Rabbit;
 using System.Threading.Tasks;
 
 namespace DriverService.Handlers
 {
-    public class RunCompletedHandler
+    public class RunCompletedHandler : GenericListener<TimedEvent>
     {
         private readonly ReadModelService readModelService;
 
-        public RunCompletedHandler(ReadModelService readModelService)
+        public RunCompletedHandler(ReadModelService readModelService) : base("driver.status-update.run-completed.service")
         {
             this.readModelService = readModelService;
         }
 
-        public async Task HandleMessage(TimedEvent data)
+        public override async Task<bool> HandleMessage(TimedEvent data)
         {
             // Update Status to Idle
             var success = await this.readModelService.UpdateStatus(data.DriverId, DriverStatus.Idle);
@@ -37,7 +38,7 @@ namespace DriverService.Handlers
                 DNCs = 0.136m
             };
 
-            await this.readModelService.UpdateDriverWithStats(data.DriverId, todaysStats, overAllStats);
+            return await this.readModelService.UpdateDriverWithStats(data.DriverId, todaysStats, overAllStats);
         }
     }
 }

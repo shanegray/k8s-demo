@@ -2,6 +2,7 @@
 using DriverService.Models;
 using DriverService.Service;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace DriverService.Controllers
@@ -12,11 +13,16 @@ namespace DriverService.Controllers
     {
         private readonly EventStoreService eventStoreService;
         private readonly ReadModelService readModelService;
+        private readonly MessengerService messengerService;
 
-        public DriverController(EventStoreService eventStoreService, ReadModelService readModelService)
+        public DriverController(
+            EventStoreService eventStoreService, 
+            ReadModelService readModelService,
+            MessengerService messengerService)
         {
             this.eventStoreService = eventStoreService;
             this.readModelService = readModelService;
+            this.messengerService = messengerService;
         }
 
         [HttpGet]
@@ -29,6 +35,7 @@ namespace DriverService.Controllers
         public async Task<IActionResult> Create([FromBody] HiredEvent data)
         {
             await this.eventStoreService.Hire(data);
+            this.messengerService.DriverHiredMessage(data);
             return this.OkMessage();
         }
 
@@ -44,7 +51,14 @@ namespace DriverService.Controllers
             if (eventType == null)
                 return this.NotFound();
 
-            await this.eventStoreService.AddStatusEvent(driverId, eventType.Value);
+            var timedEvent = new TimedEvent
+            {
+                DriverId = driverId,
+                Time = DateTime.UtcNow
+            };
+
+            await this.eventStoreService.AddStatusEvent(driverId, eventType.Value, timedEvent);
+            this.messengerService.StatusUpdate(timedEvent, eventString);
 
             return this.OkMessage();
         }

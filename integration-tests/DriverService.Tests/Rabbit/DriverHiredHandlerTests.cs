@@ -18,6 +18,12 @@ namespace DriverService.Tests.Rabbit
         }
 
         [Fact]
+        public void Handled_connected_to_right_queue()
+        {
+            Assert.Equal("driver.hired.service", this.sut.QueueName);
+        }
+
+        [Fact]
         public async Task New_hired_event_generates_read_model()
         {
             var hireEvent = this.fixture.UniqueHireEvent();
