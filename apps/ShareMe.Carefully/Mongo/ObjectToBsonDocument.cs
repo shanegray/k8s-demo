@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization;
 using Newtonsoft.Json;
 
-namespace DriverService.MongoConverters
+namespace ShareMe.Carefully
 {
     public class ObjectToBsonDocument
     {
